@@ -401,6 +401,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.action_share:
                 msg += "Click share";
                 break;
+            case R.id.action_level1:
+                break;
 //            case R.id.action_level1:
 //                levIndex = 0;
 //                if(levList.size()>levIndex){
