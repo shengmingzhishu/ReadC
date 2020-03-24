@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+      xmlns:app="http://schemas.android.com/apk/res-auto"
+      xmlns:tools="http://schemas.android.com/tools"
+      tools:context=".MainActivity">
+
+    <item android:id="@+id/action_edit"
+          android:title="action_edit"
+          android:orderInCategory="80"
+          android:icon="@drawable/icon_main_male"
+          app:showAsAction="ifRoom" />
+
+    <item android:id="@+id/action_share"
+          android:title="action_edit"
+          android:orderInCategory="90"
+          android:icon="@drawable/icon_main_overview"
+          app:showAsAction="ifRoom" />
+
+    <item android:id="@+id/action_level1"
+          android:title="一年级"
+          android:orderInCategory="100"
+          app:showAsAction="never"/>
+    <item android:id="@+id/action_level2"
+        android:title="二年级"
+        android:orderInCategory="100"
+        app:showAsAction="never"/>
+    <item android:id="@+id/action_level3"
+        android:title="三年级"
+        android:orderInCategory="100"
+        app:showAsAction="never"/>
+    <item android:id="@+id/action_level4"
+        android:title="四年级"
+        android:orderInCategory="100"
+        app:showAsAction="never"/>
+    <item android:id="@+id/action_level5"
+        android:title="五年级"
+        android:orderInCategory="100"
+        app:showAsAction="never"/>
+    <item android:id="@+id/action_level6"
+        android:title="六年级"
+        android:orderInCategory="100"
+        app:showAsAction="never"/>
+
+</menu>
