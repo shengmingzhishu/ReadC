@@ -40,6 +40,7 @@ import java.util.Set;
 public class MainActivity extends AppCompatActivity implements View.OnClickListener, TextToSpeech.OnInitListener {
 
     private static final String TAG = "MainActivity";
+    private static final String TAG1 = "MainActivity";
 
     private List<String> class001List = new ArrayList<String>();
     private List<String> class002List = new ArrayList<String>();
