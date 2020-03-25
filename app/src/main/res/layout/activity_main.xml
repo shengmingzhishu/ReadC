@@ -100,9 +100,11 @@
             android:visibility="gone"/>
 
         <LinearLayout
+            android:id="@+id/ll_bottom"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
+            android:visibility="gone"
             android:orientation="horizontal">
 
             <Button
@@ -123,6 +125,17 @@
                 android:text="next"
                 android:textSize="15dp" />
         </LinearLayout>
+
+
+        <Button
+            android:id="@+id/btn_next_grade"
+            android:layout_width="250dp"
+            android:layout_height="60dp"
+            android:layout_margin="5dp"
+            android:layout_gravity="center_horizontal"
+            android:text="start"
+            android:textSize="15dp" />
+
     </LinearLayout>
 
 

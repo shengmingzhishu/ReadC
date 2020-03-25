@@ -32,9 +32,11 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener, TextToSpeech.OnInitListener {
@@ -61,11 +63,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private LinearLayout ll_setting;
     private TextView tv_sav_all;
     private RelativeLayout rl_container;
+    private Button btn_next_grade;
+    private LinearLayout ll_bottom;
 
     // 控制当前阅读列表
     private List<String> list = new ArrayList<String>();
-    private List<List<String>> levList = new ArrayList<>();
-    private int levIndex = 0;
+//    private List<List<String>> levList = new ArrayList<>();
+
+    private int levIndex = -1;
     private int index = -1;
 
     // 文本朗读引擎
@@ -73,6 +78,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private Set<String> stringSet = new HashSet<>();
 
+    private Map<String,List<String>> txtMap = new HashMap<>();
+
+    private String mapKey = "level";
     @Override
     protected void onStart() {
         super.onStart();
@@ -106,17 +114,33 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         InputStream inputStreamClass006 = getResources().openRawResource(R.raw.class006);
         putListByStr(class006List, getString(inputStreamClass006));
 
-        levList.add(class001List);
-        levList.add(class002List);
-        levList.add(class003List);
-        levList.add(class004List);
-        levList.add(class005List);
-        levList.add(class006List);
-
         stringSet = SharedUtils.getWord(MainActivity.this);
+
+        removeTxt(class001List);
+        txtMap.put(mapKey+0,class001List);
+        removeTxt(class002List);
+        txtMap.put(mapKey+1,class002List);
+        removeTxt(class003List);
+        txtMap.put(mapKey+2,class003List);
+        removeTxt(class004List);
+        txtMap.put(mapKey+3,class004List);
+        removeTxt(class005List);
+        txtMap.put(mapKey+4,class005List);
+        removeTxt(class006List);
+        txtMap.put(mapKey+5,class006List);
+
         // 设置1年级为默认单词
-        setDefaultList(levList.get(0));
-        index = -1;
+//        setDefaultList(txtMap.get(mapKey+levIndex));
+    }
+
+    private void removeTxt(List<String> stringList){
+        List<String> list = new ArrayList<>();
+        for(int i = 0;i<stringList.size();i++){
+            if(stringSet.contains(stringList.get(i))){
+                list.add(stringList.get(i));
+            }
+        }
+        stringList.removeAll(list);
     }
 
     private void setDefaultList(List<String> class001List) {
@@ -138,6 +162,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         ll_setting = findViewById(R.id.ll_setting);
         tv_sav_all = findViewById(R.id.tv_sav_all);
         rl_container = findViewById(R.id.rl_container);
+        btn_next_grade = findViewById(R.id.btn_next_grade);
+        ll_bottom = findViewById(R.id.ll_bottom);
         setSupportActionBar(toolbar);
         //显示返回按钮
         getSupportActionBar().setHomeButtonEnabled(true);
@@ -175,6 +201,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         imgRing.setOnClickListener(this);
         imgDel.setOnClickListener(this);
         ll_txt.setOnClickListener(this);
+        btn_next_grade.setOnClickListener(this);
     }
 
     private void initTTS() {
@@ -208,7 +235,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.imgDel:
                 stringSet.add(list.get(index));
                 SharedUtils.putWord(stringSet, MainActivity.this);
+                list.remove(index);
                 index -= 1;
+                next();
+                break;
+            case R.id.btn_next_grade:
+                if(levIndex < 6-1){
+                    levIndex += 1;
+                }else{
+                    levIndex = 0;
+                }
+                setDefaultList(txtMap.get(mapKey+levIndex));
                 next();
                 break;
         }
@@ -217,13 +254,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void pervice() {
         tv_spell.setVisibility(View.VISIBLE);
         ll_setting.setVisibility(View.VISIBLE);
-        if (list.size() == 0) {
-            return;
-        }
-        String str = list.get(index = (index - 1 < 0 ? list.size() - 1 : index - 1));
-        if (stringSet.contains(str)) {
-            pervice();
-        } else {
+        if (list!=null && list.size() > 0) {
+            String str = list.get(index = (index - 1 < 0 ? list.size() - 1 : index - 1));
             textView.setText(str);
             tv_spell.setText(Cn2Spell.getPinYin(str));
             speackText(str);
@@ -233,54 +265,24 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void next() {
         tv_spell.setVisibility(View.VISIBLE);
         ll_setting.setVisibility(View.VISIBLE);
-
-        if (list.size() == 0) {
-            if (levList.size() > 0) {
-                levList.remove(list);
-                if (levIndex >= levList.size()) {
-                    levIndex = 0;
-                }
-                if (levList.size() == 0) {
-                    rl_container.setVisibility(View.GONE);
-                    tv_sav_all.setVisibility(View.VISIBLE);
-                    return;
-                }
-                list = levList.get(levIndex);
-                index = -1;
-                next();
-            }
-        }
-
-        if (levList.size() == 0) {
-            rl_container.setVisibility(View.GONE);
-            tv_sav_all.setVisibility(View.VISIBLE);
-            return;
-        }
-
-        String str = list.get(index = (index + 1 >= list.size() ? 0 : index + 1));
-        if (stringSet.contains(str)) {
-            list.remove(str);
-            next();
-        } else {
+        if(list !=null && list.size()>0){
+            rl_container.setVisibility(View.VISIBLE);
+            ll_bottom.setVisibility(View.VISIBLE);
+            btn_next_grade.setVisibility(View.GONE);
+            tv_sav_all.setVisibility(View.GONE);
+            String str = list.get(index = (index + 1 >= list.size() ? 0 : index + 1));
             textView.setText(str);
             tv_spell.setText(Cn2Spell.getPinYin(str));
             speackText(str);
-        }
-    }
-
-    private void nextLev() {
-        if (levIndex > levList.size()) {
+        }else {
             rl_container.setVisibility(View.GONE);
             tv_sav_all.setVisibility(View.VISIBLE);
-            return;
+            ll_bottom.setVisibility(View.GONE);
+            btn_next_grade.setVisibility(View.VISIBLE);
         }
-        list = levList.get(levIndex);
-        index = -1;
-        if (list.size() == 0) {
-            levIndex += 1;
-            nextLev();
-        }
+        btn_next_grade.setText("next grade");
     }
+
 
     private void speackText(String str) {
         Log.e(TAG, "speackText: " + textView.getText().toString());
@@ -402,54 +404,39 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 msg += "Click share";
                 break;
             case R.id.action_level1:
+                levIndex = 0;
+                setDefaultList(txtMap.get(mapKey+levIndex));
+                next();
                 break;
-//            case R.id.action_level1:
-//                levIndex = 0;
-//                if(levList.size()>levIndex){
-//                    setDefaultList(levList.get(levIndex));
-//                }
-//                next();
-//                break;
-//            case R.id.action_level2:
-//                levIndex = 1;
-//                if(levList.size()>levIndex){
-//                    setDefaultList(levList.get(levIndex));
-//                }
-//                next();
-//                break;
-//            case R.id.action_level3:
-//                levIndex = 2;
-//                if(levList.size()>levIndex){
-//                    setDefaultList(levList.get(levIndex));
-//                }
-//                next();
-//                break;
-//            case R.id.action_level4:
-//                levIndex = 3;
-//                if(levList.size()>levIndex){
-//                    setDefaultList(levList.get(levIndex));
-//                }
-//                next();
-//                break;
-//            case R.id.action_level5:
-//                levIndex = 4;
-//                if(levList.size()>levIndex){
-//                    setDefaultList(levList.get(levIndex));
-//                }
-//                next();
-//                break;
-//            case R.id.action_level6:
-//                levIndex = 5;
-//                if(levList.size()>levIndex){
-//                    setDefaultList(levList.get(levIndex));
-//                }
-//                next();
-//                break;
+            case R.id.action_level2:
+                levIndex = 1;
+                setDefaultList(txtMap.get(mapKey+levIndex));
+                next();
+                break;
+            case R.id.action_level3:
+                levIndex = 2;
+                setDefaultList(txtMap.get(mapKey+levIndex));
+                next();
+                break;
+            case R.id.action_level4:
+                levIndex = 3;
+                setDefaultList(txtMap.get(mapKey+levIndex));
+                next();
+                break;
+            case R.id.action_level5:
+                levIndex = 4;
+                setDefaultList(txtMap.get(mapKey+levIndex));
+                next();
+                break;
+            case R.id.action_level6:
+                levIndex = 5;
+                setDefaultList(txtMap.get(mapKey+levIndex));
+                next();
+                break;
             case android.R.id.home:
                 drawerLayout.openDrawer(GravityCompat.START);
                 break;
         }
-//        Toast.makeText(MainActivity.this, msg, Toast.LENGTH_LONG).show();
         return super.onOptionsItemSelected(item);
     }
 
