@@ -24,13 +24,13 @@
         <RelativeLayout
             android:id="@+id/rl_container"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
+            android:layout_height="wrap_content"
             android:layout_weight="1"
             android:orientation="horizontal">
 
             <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
                 android:layout_centerInParent="true"
                 android:gravity="center_horizontal"
                 android:orientation="vertical">
@@ -40,6 +40,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerHorizontal="true"
+                    android:layout_marginTop="-40dp"
                     android:gravity="center"
                     android:orientation="vertical">
 
@@ -47,15 +48,16 @@
                         android:id="@+id/txtView"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="^_^"
-                        android:textSize="250sp" />
+                        android:text="✍"
+                        android:textSize="300sp" />
 
                     <TextView
                         android:id="@+id/tv_spell"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:textSize="25sp"
-                        android:layout_marginTop="10dp"
+                        android:layout_marginTop="-30dp"
+                        android:text="✍"
+                        android:textSize="68dp"
                         android:visibility="gone" />
                 </LinearLayout>
 
@@ -65,7 +67,6 @@
                     android:layout_height="wrap_content"
                     android:layout_below="@id/ll_txt"
                     android:layout_centerInParent="true"
-                    android:layout_marginTop="60dp"
                     android:orientation="horizontal"
                     android:visibility="gone">
 
@@ -94,18 +95,19 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
-            android:text="您已学完所有生字！"
             android:gravity="center"
+            android:text="您已学完所有生字！"
             android:textSize="30sp"
-            android:visibility="gone"/>
+            android:visibility="gone" />
 
         <LinearLayout
             android:id="@+id/ll_bottom"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
-            android:visibility="gone"
-            android:orientation="horizontal">
+            android:layout_marginBottom="60dp"
+            android:orientation="horizontal"
+            android:visibility="gone">
 
             <Button
                 android:id="@+id/btnPer"
@@ -131,8 +133,8 @@
             android:id="@+id/btn_next_grade"
             android:layout_width="250dp"
             android:layout_height="60dp"
-            android:layout_margin="5dp"
             android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="60dp"
             android:text="start"
             android:textSize="15dp" />
 

@@ -225,6 +225,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 next();
                 break;
             case R.id.txtView:
+                speackText(textView.getText().toString());
                 break;
             case R.id.imgRing:
                 speackText(textView.getText().toString());
@@ -326,7 +327,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         //设定语速 ，默认1.0正常语速
         textToSpeech.setSpeechRate(1f);
         //朗读，注意这里三个参数的added in API level 4   四个参数的added in API level 21
-        textToSpeech.speak("李沫言你好,欢迎学习汉字！", TextToSpeech.QUEUE_FLUSH, null);
+        textToSpeech.speak("语音宝,欢迎学习汉字！", TextToSpeech.QUEUE_FLUSH, null);
     }
 
 
