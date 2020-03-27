@@ -65,6 +65,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private RelativeLayout rl_container;
     private Button btn_next_grade;
     private LinearLayout ll_bottom;
+    private Button btn_revert;
 
     // 控制当前阅读列表
     private List<String> list = new ArrayList<String>();
@@ -78,9 +79,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private Set<String> stringSet = new HashSet<>();
 
-    private Map<String,List<String>> txtMap = new HashMap<>();
+    private Map<String, List<String>> txtMap = new HashMap<>();
+
+    private List<List<String>> sourceList = new ArrayList<>();
 
     private String mapKey = "level";
+
     @Override
     protected void onStart() {
         super.onStart();
@@ -116,31 +120,36 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         stringSet = SharedUtils.getWord(MainActivity.this);
 
-        removeTxt(class001List);
-        txtMap.put(mapKey+0,class001List);
-        removeTxt(class002List);
-        txtMap.put(mapKey+1,class002List);
-        removeTxt(class003List);
-        txtMap.put(mapKey+2,class003List);
-        removeTxt(class004List);
-        txtMap.put(mapKey+3,class004List);
-        removeTxt(class005List);
-        txtMap.put(mapKey+4,class005List);
-        removeTxt(class006List);
-        txtMap.put(mapKey+5,class006List);
+        sourceList.add(class001List);
+        sourceList.add(class002List);
+        sourceList.add(class003List);
+        sourceList.add(class004List);
+        sourceList.add(class005List);
+        sourceList.add(class006List);
+
+        txtMap.put(mapKey + 0, removeTxt(class001List));
+        txtMap.put(mapKey + 1, removeTxt(class002List));
+        txtMap.put(mapKey + 2, removeTxt(class003List));
+        txtMap.put(mapKey + 3, removeTxt(class004List));
+        txtMap.put(mapKey + 4, removeTxt(class005List));
+        txtMap.put(mapKey + 5, removeTxt(class006List));
+
 
         // 设置1年级为默认单词
 //        setDefaultList(txtMap.get(mapKey+levIndex));
     }
 
-    private void removeTxt(List<String> stringList){
+    private List<String> removeTxt(List<String> stringList) {
         List<String> list = new ArrayList<>();
-        for(int i = 0;i<stringList.size();i++){
-            if(stringSet.contains(stringList.get(i))){
-                list.add(stringList.get(i));
+        List<String> txtList = new ArrayList<>();
+        txtList.addAll(stringList);
+        for (int i = 0; i < txtList.size(); i++) {
+            if (stringSet.contains(txtList.get(i))) {
+                list.add(txtList.get(i));
             }
         }
-        stringList.removeAll(list);
+        txtList.removeAll(list);
+        return txtList;
     }
 
     private void setDefaultList(List<String> class001List) {
@@ -164,6 +173,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         rl_container = findViewById(R.id.rl_container);
         btn_next_grade = findViewById(R.id.btn_next_grade);
         ll_bottom = findViewById(R.id.ll_bottom);
+        btn_revert = findViewById(R.id.btn_revert);
         setSupportActionBar(toolbar);
         //显示返回按钮
         getSupportActionBar().setHomeButtonEnabled(true);
@@ -202,6 +212,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         imgDel.setOnClickListener(this);
         ll_txt.setOnClickListener(this);
         btn_next_grade.setOnClickListener(this);
+        btn_revert.setOnClickListener(this);
     }
 
     private void initTTS() {
@@ -225,7 +236,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 next();
                 break;
             case R.id.txtView:
-                speackText(textView.getText().toString());
                 break;
             case R.id.imgRing:
                 speackText(textView.getText().toString());
@@ -241,12 +251,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 next();
                 break;
             case R.id.btn_next_grade:
-                if(levIndex < 6-1){
+                if (levIndex < 6 - 1) {
                     levIndex += 1;
-                }else{
+                } else {
                     levIndex = 0;
                 }
-                setDefaultList(txtMap.get(mapKey+levIndex));
+                setDefaultList(txtMap.get(mapKey + levIndex));
+                next();
+                break;
+            case R.id.btn_revert:
+                stringSet.removeAll(sourceList.get(levIndex));
+                SharedUtils.putWord(stringSet, MainActivity.this);
+                txtMap.get(mapKey + levIndex).addAll(sourceList.get(levIndex));
+                setDefaultList(txtMap.get(mapKey + levIndex));
                 next();
                 break;
         }
@@ -255,7 +272,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void pervice() {
         tv_spell.setVisibility(View.VISIBLE);
         ll_setting.setVisibility(View.VISIBLE);
-        if (list!=null && list.size() > 0) {
+        if (list != null && list.size() > 0) {
             String str = list.get(index = (index - 1 < 0 ? list.size() - 1 : index - 1));
             textView.setText(str);
             tv_spell.setText(Cn2Spell.getPinYin(str));
@@ -266,7 +283,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void next() {
         tv_spell.setVisibility(View.VISIBLE);
         ll_setting.setVisibility(View.VISIBLE);
-        if(list !=null && list.size()>0){
+        if (list != null && list.size() > 0) {
             rl_container.setVisibility(View.VISIBLE);
             ll_bottom.setVisibility(View.VISIBLE);
             btn_next_grade.setVisibility(View.GONE);
@@ -274,12 +291,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             String str = list.get(index = (index + 1 >= list.size() ? 0 : index + 1));
             textView.setText(str);
             tv_spell.setText(Cn2Spell.getPinYin(str));
+            btn_revert.setVisibility(View.GONE);
             speackText(str);
-        }else {
+        } else {
             rl_container.setVisibility(View.GONE);
             tv_sav_all.setVisibility(View.VISIBLE);
             ll_bottom.setVisibility(View.GONE);
             btn_next_grade.setVisibility(View.VISIBLE);
+            btn_revert.setVisibility(View.VISIBLE);
         }
         btn_next_grade.setText("next grade");
     }
@@ -327,7 +346,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         //设定语速 ，默认1.0正常语速
         textToSpeech.setSpeechRate(1f);
         //朗读，注意这里三个参数的added in API level 4   四个参数的added in API level 21
-        textToSpeech.speak("语音宝,欢迎学习汉字！", TextToSpeech.QUEUE_FLUSH, null);
+        textToSpeech.speak("李沫言你好,欢迎学习汉字！", TextToSpeech.QUEUE_FLUSH, null);
     }
 
 
@@ -406,32 +425,32 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
             case R.id.action_level1:
                 levIndex = 0;
-                setDefaultList(txtMap.get(mapKey+levIndex));
+                setDefaultList(txtMap.get(mapKey + levIndex));
                 next();
                 break;
             case R.id.action_level2:
                 levIndex = 1;
-                setDefaultList(txtMap.get(mapKey+levIndex));
+                setDefaultList(txtMap.get(mapKey + levIndex));
                 next();
                 break;
             case R.id.action_level3:
                 levIndex = 2;
-                setDefaultList(txtMap.get(mapKey+levIndex));
+                setDefaultList(txtMap.get(mapKey + levIndex));
                 next();
                 break;
             case R.id.action_level4:
                 levIndex = 3;
-                setDefaultList(txtMap.get(mapKey+levIndex));
+                setDefaultList(txtMap.get(mapKey + levIndex));
                 next();
                 break;
             case R.id.action_level5:
                 levIndex = 4;
-                setDefaultList(txtMap.get(mapKey+levIndex));
+                setDefaultList(txtMap.get(mapKey + levIndex));
                 next();
                 break;
             case R.id.action_level6:
                 levIndex = 5;
-                setDefaultList(txtMap.get(mapKey+levIndex));
+                setDefaultList(txtMap.get(mapKey + levIndex));
                 next();
                 break;
             case android.R.id.home:
